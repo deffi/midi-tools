@@ -31,8 +31,10 @@ def main(input_reference: str = typer.Option(None, "--in"),
     RequestHandler.output = output
 
     with socketserver.TCPServer(("0.0.0.0", port), RequestHandler) as server:
-        server.serve_forever()
-
+        try:
+            server.serve_forever()
+        finally:
+            server.server_close()
 
 if __name__ == "__main__":
     with midi.main():
