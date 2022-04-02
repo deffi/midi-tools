@@ -19,26 +19,28 @@ class RequestHandler(socketserver.BaseRequestHandler):
         self.request.sendall(bytes(message))
 
     def setup(self):
-        self.input.set_callback(self.handle_midi)
+        if self.input:
+            self.input.set_callback(self.handle_midi)
 
     def handle(self):
         print("Handler")
 
-        while data := self.request.recv(6):
+        while data := self.request.recv(3):
             print(f"From {self.client_address}: {data}")
-            self.output.send_message(list(data))
+            if self.output:
+                self.output.send_message(list(data))
 
         print("Bye")
 
     def finish(self) -> None:
-        self.input.cancel_callback()
-
+        if self.input:
+            self.input.cancel_callback()
 
 
 def main(input_port: str = typer.Option(None, "--in"),
          output_port: str = typer.Option(None, "--out")):
-    input_, input_name  = midi.open_input(input_port)
-    output, output_name = midi.open_output(output_port)
+    input_, input_name  = midi.open_input(input_port) if input_port else (None, None)
+    output, output_name = midi.open_output(output_port) if output_port else (None, None)
 
     print(f"Input:  {input_name}")
     print(f"Output: {output_name}")
