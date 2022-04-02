@@ -1,5 +1,5 @@
 from socket import socket as sock
-from typing import Optional
+from typing import Optional, List
 
 import rtmidi
 
@@ -10,9 +10,13 @@ class SocketMidiBridge:
         self._midi_in = midi_in
         self._midi_out = midi_out
 
+    def _format_message(self, message: List[int]) -> str:
+        return " ".join(f"{m:02X}" for m in message)
+
     def _handle_midi(self, event, _):
         message, _ = event
         self._socket.sendall(len(message).to_bytes(4, "big") + bytes(message))
+        print(f"> {self._format_message(message)}")
 
     def _receive_length(self) -> Optional[int]:
         data = self._socket.recv(4)
@@ -52,7 +56,10 @@ class SocketMidiBridge:
                     break
 
                 if self._midi_out:
-                    self._midi_out.send_message(list(data))
+                    message = list(data)
+                    self._midi_out.send_message(message)
+                    print(f"> {self._format_message(message)}")
+
         except ConnectionResetError:
             pass
         finally:
