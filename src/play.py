@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from time import sleep
 
 from rtmidi.midiconstants import NOTE_ON, CONTROLLER_CHANGE, ALL_NOTES_OFF
