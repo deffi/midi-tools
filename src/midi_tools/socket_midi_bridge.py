@@ -43,8 +43,6 @@ class SocketMidiBridge:
         if self._midi_in:
             self._midi_in.set_callback(self._handle_midi)
 
-        buffer = bytes()
-
         try:
             while True:
                 length = self._receive_length()
