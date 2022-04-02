@@ -10,11 +10,13 @@ from midi_tools import midi, SocketMidiBridge
 
 
 class RequestHandler(socketserver.BaseRequestHandler):
-    input: Optional[rtmidi.MidiIn] = None
-    output: Optional[rtmidi.MidiOut] = None
+    def __init__(self, midi_in: Optional[rtmidi.MidiIn], midi_out: Optional[rtmidi.MidiOut], *args, **kwargs):
+        self._midi_in = midi_in
+        self._midi_out = midi_out
+        super().__init__(*args, **kwargs)
 
     def handle(self):
-        SocketMidiBridge(self.request, self.input, self.output).run()
+        SocketMidiBridge(self.request, self._midi_in, self._midi_out).run()
 
 
 def main(input_reference: str = typer.Option(None, "--in"),
@@ -27,10 +29,10 @@ def main(input_reference: str = typer.Option(None, "--in"),
     print(f"Input:  {input_name}")
     print(f"Output: {output_name}")
 
-    RequestHandler.input = input_
-    RequestHandler.output = output
+    def create_request_handler(*args, **kwargs):
+        return RequestHandler(input_, output, *args, **kwargs)
 
-    with socketserver.TCPServer(("0.0.0.0", port), RequestHandler, bind_and_activate=False) as server:
+    with socketserver.TCPServer(("0.0.0.0", port), create_request_handler, bind_and_activate=False) as server:
         server.allow_reuse_address = True
         server.server_bind()
         server.server_activate()
