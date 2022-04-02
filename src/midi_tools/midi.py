@@ -1,21 +1,21 @@
 from contextlib import contextmanager
-from typing import Sequence, Optional, Any
+from typing import Sequence, Optional, Any, TypeVar, Type
 
 import rtmidi
 
 from midi_tools.util.int import is_int
 
 
+MidiInOut = TypeVar("MidiInOut", rtmidi.MidiIn, rtmidi.MidiOut)
+
+
 class AmbiguousPort(RuntimeError):
     pass
 
 
-def resolve_name(names: Sequence[str], reference: Optional[str]) -> int:
+def resolve_name(names: Sequence[str], reference: Optional[str]) -> Optional[int]:
     if reference is None:
-        if len(names) == 1:
-            return 0
-        else:
-            raise AmbiguousPort(reference)
+        return None
 
     elif is_int(reference):
         return int(reference)
@@ -28,12 +28,21 @@ def resolve_name(names: Sequence[str], reference: Optional[str]) -> int:
             raise AmbiguousPort(reference)
 
 
-def open_port(port_type: type, reference: Optional[str]) -> (Any, str):
+def open_port(port_type: Type[MidiInOut], reference: Optional[str]) -> (Optional[MidiInOut], Optional[str]):
+    # Create a port of the specified type
     port = port_type()
+
+    # Determine the index of the specified port
     port_names = port.get_ports()
     index = resolve_name(port_names, reference)
-    port.open_port(index)
-    return port, port_names[index]
+
+    # Open the port and return it along with its name. Exception: if index is
+    # None, return (None, None).
+    if index is None:
+        return None, None
+    else:
+        port.open_port(index)
+        return port, port_names[index]
 
 
 def open_input(reference: Optional[str]) -> (rtmidi.MidiIn, str):

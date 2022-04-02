@@ -9,8 +9,8 @@ from midi_tools import midi, SocketMidiBridge
 
 def main(input_port: str = typer.Option(None, "--in"),
          output_port: str = typer.Option(None, "--out")):
-    input_, input_name  = midi.open_input(input_port) if input_port else (None, None)
-    output, output_name = midi.open_output(output_port) if output_port else (None, None)
+    input_, input_name  = midi.open_input(input_port)
+    output, output_name = midi.open_output(output_port)
 
     print(f"Input:  {input_name}")
     print(f"Output: {output_name}")
