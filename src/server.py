@@ -30,7 +30,10 @@ def main(input_reference: str = typer.Option(None, "--in"),
     RequestHandler.input = input_
     RequestHandler.output = output
 
-    with socketserver.TCPServer(("0.0.0.0", port), RequestHandler) as server:
+    with socketserver.TCPServer(("0.0.0.0", port), RequestHandler, bind_and_activate=False) as server:
+        server.allow_reuse_address = True
+        server.server_bind()
+        server.server_activate()
         server.serve_forever()
 
 if __name__ == "__main__":
