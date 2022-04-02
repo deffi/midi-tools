@@ -56,7 +56,7 @@ class SocketMidiBridge:
                 if self._midi_out:
                     message = list(data)
                     self._midi_out.send_message(message)
-                    print(f"> {self._format_message(message)}")
+                    print(f"< {self._format_message(message)}")
 
         except ConnectionResetError:
             pass
