@@ -1,40 +1,20 @@
 #!/usr/bin/env python3
 
-from time import sleep
 from typing import Optional
 import socketserver
 
 import rtmidi
 import typer
 
-from midi_tools import midi
+from midi_tools import midi, SocketMidiBridge
 
 
 class RequestHandler(socketserver.BaseRequestHandler):
     input: Optional[rtmidi.MidiIn] = None
     output: Optional[rtmidi.MidiOut] = None
 
-    def handle_midi(self, event, data=None):
-        message, _ = event
-        self.request.sendall(bytes(message))
-
-    def setup(self):
-        if self.input:
-            self.input.set_callback(self.handle_midi)
-
     def handle(self):
-        print("Handler")
-
-        while data := self.request.recv(3):
-            print(f"From {self.client_address}: {data}")
-            if self.output:
-                self.output.send_message(list(data))
-
-        print("Bye")
-
-    def finish(self) -> None:
-        if self.input:
-            self.input.cancel_callback()
+        SocketMidiBridge(self.request, self.input, self.output).run()
 
 
 def main(input_port: str = typer.Option(None, "--in"),
