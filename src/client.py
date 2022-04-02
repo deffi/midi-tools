@@ -7,16 +7,25 @@ import typer
 from midi_tools import midi, SocketMidiBridge
 
 
-def main(input_port: str = typer.Option(None, "--in"),
-         output_port: str = typer.Option(None, "--out")):
-    input_, input_name  = midi.open_input(input_port)
-    output, output_name = midi.open_output(output_port)
+def main(server: str,
+         input_reference: str = typer.Option(None, "--in"),
+         output_reference: str = typer.Option(None, "--out")):
+
+    if ":" in server:
+        host, port = server.split(":")
+        port = int(port)
+    else:
+        host = server
+        port = 6000
+
+    input_, input_name  = midi.open_input(input_reference)
+    output, output_name = midi.open_output(output_reference)
 
     print(f"Input:  {input_name}")
     print(f"Output: {output_name}")
 
     with sock(AF_INET, SOCK_STREAM) as socket:
-        socket.connect(("localhost", 6000))
+        socket.connect((host, port))
         SocketMidiBridge(socket, input_, output).run()
 
 

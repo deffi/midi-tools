@@ -17,10 +17,12 @@ class RequestHandler(socketserver.BaseRequestHandler):
         SocketMidiBridge(self.request, self.input, self.output).run()
 
 
-def main(input_port: str = typer.Option(None, "--in"),
-         output_port: str = typer.Option(None, "--out")):
-    input_, input_name  = midi.open_input(input_port)
-    output, output_name = midi.open_output(output_port)
+def main(input_reference: str = typer.Option(None, "--in"),
+         output_reference: str = typer.Option(None, "--out"),
+         port: int = 6000):
+
+    input_, input_name  = midi.open_input(input_reference)
+    output, output_name = midi.open_output(output_reference)
 
     print(f"Input:  {input_name}")
     print(f"Output: {output_name}")
@@ -28,7 +30,7 @@ def main(input_port: str = typer.Option(None, "--in"),
     RequestHandler.input = input_
     RequestHandler.output = output
 
-    with socketserver.TCPServer(("0.0.0.0", 6000), RequestHandler) as server:
+    with socketserver.TCPServer(("0.0.0.0", port), RequestHandler) as server:
         server.serve_forever()
 
 
