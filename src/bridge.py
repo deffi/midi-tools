@@ -28,11 +28,12 @@ def start_bridge(input_name: Optional[str], output_name: Optional[str], prefix: 
     input_, input_name  = midi.open_input(input_name)
     output, output_name = midi.open_output(output_name)
 
+    description = f"{input_name} -> {output_name}"
     if prefix is None:
-        prefix = f"{input_name} -> {output_name}: "
-        print(prefix)
+        print(description)
+        prefix = f"{description}: "
     else:
-        print(f"{prefix}: {input_name} -> {output_name}")
+        print(f"{prefix}: {description}")
 
     MidiBridge(input_, output, prefix).start()
 
