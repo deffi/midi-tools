@@ -29,6 +29,7 @@ def resolve_name(names: Sequence[str], reference: Optional[str]) -> Optional[int
 
 
 def open_port(port_type: Type[MidiInOut], reference: Optional[str]) -> (Optional[MidiInOut], Optional[str]):
+    """Returns port, name"""
     # Create a port of the specified type
     port = port_type()
 
@@ -46,7 +47,13 @@ def open_port(port_type: Type[MidiInOut], reference: Optional[str]) -> (Optional
 
 
 def open_input(reference: Optional[str]) -> (rtmidi.MidiIn, str):
-    return open_port(rtmidi.MidiIn, reference)
+    port, name = open_port(rtmidi.MidiIn, reference)
+
+    # Ignore active sensing, but receive everything else
+    if port:
+        port.ignore_types(sysex=False, timing=False, active_sense=True)
+
+    return port, name
 
 
 def open_output(reference: Optional[str]) -> (rtmidi.MidiOut, str):
