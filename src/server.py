@@ -16,7 +16,7 @@ class RequestHandler(socketserver.BaseRequestHandler):
         super().__init__(*args, **kwargs)
 
     def handle(self):
-        SocketMidiBridge(self.request, self._midi_in, self._midi_out).run()
+        SocketMidiBridge(self.request, self._midi_in, self._midi_out, "-> ", "<- ").run()
 
 
 def main(input_reference: str = typer.Option(None, "--in"),

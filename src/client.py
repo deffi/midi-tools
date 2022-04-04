@@ -26,7 +26,7 @@ def main(server: str,
 
     with sock(AF_INET, SOCK_STREAM) as socket:
         socket.connect((host, port))
-        SocketMidiBridge(socket, input_, output).run()
+        SocketMidiBridge(socket, input_, output, "<- ", "-> ").run()
 
 
 if __name__ == "__main__":

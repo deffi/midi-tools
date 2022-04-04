@@ -5,18 +5,24 @@ import rtmidi
 
 
 class SocketMidiBridge:
-    def __init__(self, socket: sock, midi_in: Optional[rtmidi.MidiIn], midi_out: Optional[rtmidi.MidiOut]):
+    def __init__(self, socket: sock,
+                 midi_in: Optional[rtmidi.MidiIn], midi_out: Optional[rtmidi.MidiOut],
+                 socket_prefix: Optional[str] = None, midi_prefix: Optional[str] = None):
         self._socket = socket
         self._midi_in = midi_in
         self._midi_out = midi_out
+        self._socket_prefix = socket_prefix
+        self._midi_prefix = midi_prefix
 
-    def _format_message(self, message: List[int]) -> str:
-        return " ".join(f"{m:02X}" for m in message)
+    @staticmethod
+    def _format_message(message: List[int], prefix: str) -> str:
+        return prefix + " ".join(f"{m:02X}" for m in message)
 
     def _handle_midi(self, event, _):
         message, _ = event
         self._socket.sendall(len(message).to_bytes(4, "big") + bytes(message))
-        print(f"> {self._format_message(message)}")
+        if self._midi_prefix is not None:
+            print(self._format_message(message, self._midi_prefix))
 
     def _receive_length(self) -> Optional[int]:
         data = self._socket.recv(4)
@@ -56,7 +62,8 @@ class SocketMidiBridge:
                 if self._midi_out:
                     message = list(data)
                     self._midi_out.send_message(message)
-                    print(f"< {self._format_message(message)}")
+                    if self._socket_prefix is not None:
+                        print(self._format_message(message, self._socket_prefix))
 
         except ConnectionResetError:
             pass
