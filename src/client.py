@@ -9,7 +9,8 @@ from midi_tools import midi, SocketMidiBridge
 
 def main(server: str,
          input_reference: str = typer.Option(None, "--in"),
-         output_reference: str = typer.Option(None, "--out")):
+         output_reference: str = typer.Option(None, "--out"),
+         ascii: bool = False):
 
     if ":" in server:
         host, port = server.split(":")
@@ -26,7 +27,7 @@ def main(server: str,
 
     with sock(AF_INET, SOCK_STREAM) as socket:
         socket.connect((host, port))
-        SocketMidiBridge(socket, input_, output, "<- ", "-> ").run()
+        SocketMidiBridge(socket, input_, output, "<- ", "-> ", ascii).run()
 
 
 if __name__ == "__main__":
