@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+from midi_tools.util.message import encode
 from midi_tools.message import Message, Parser
 
 
@@ -13,7 +14,7 @@ class InstrumentDataResponseMessage(Message):
         assert len(self.payload) <= 127
 
     def to_message(self) -> bytes:
-        return bytes([0xF0, 0x43, 0x50,   0x00, 0x00, 0x02,   0x02, len(self.payload)]) + self.payload + bytes([0xF7])
+        return self.prefix + encode(len(self.payload), length=2) + self.payload + bytes([0xF7])
 
     @classmethod
     def parse(cls, raw: bytes) -> "InstrumentDataResponseMessage":

@@ -13,7 +13,7 @@ class PingResponseMessage(Message):
         assert self.payload == bytes([0x01, 0x01])
 
     def to_message(self) -> bytes:
-        return bytes([0xF0, 0x43, 0x50,   0x00, 0x00, 0x00,   0x02]) + self.payload + bytes([0xF7])
+        return self.prefix + self.payload + bytes([0xF7])
 
     @classmethod
     def parse(cls, raw: bytes) -> "PingResponseMessage":

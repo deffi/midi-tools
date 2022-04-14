@@ -18,7 +18,7 @@ class FileTypeInfoResponseMessage(Message):
         payload = encode_7_8(self.string)
         length = encode(len(payload))
 
-        return bytes([0xF0, 0x43, 0x50,   0x00, 0x00, 0x06,   0x02]) + length + payload + bytes([0xF7])
+        return self.prefix + length + payload + bytes([0xF7])
 
     @classmethod
     def parse(cls, raw: bytes) -> "FileTypeInfoResponseMessage":
