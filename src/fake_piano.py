@@ -14,7 +14,8 @@ from midi_tools.message.yamaha import \
     PingRequestMessage, PingResponseMessage, \
     ConnectionRequestMessage, ConnectionResponseMessage, \
     InstrumentDataRequestMessage, InstrumentDataResponseMessage, \
-    FileTypeInfoRequestMessage, FileTypeInfoResponseMessage
+    FileTypeInfoRequestMessage, FileTypeInfoResponseMessage, \
+    DisconnectRequestMessage
 
 
 class FakePiano:
@@ -51,6 +52,8 @@ class FakePiano:
         elif isinstance(message, ConnectionRequestMessage):
             print("Connect")
             self.send_message(ConnectionResponseMessage(None, b"\x00"))
+        elif isinstance(message, DisconnectRequestMessage):
+            print("Disconnect")
 
 def main(input_port: str = typer.Option(None, "--in"),
          output_port: str = typer.Option(None, "--out")):

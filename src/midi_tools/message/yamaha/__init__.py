@@ -6,3 +6,4 @@ from .instrument_data_request_message import InstrumentDataRequestMessage
 from .instrument_data_response_message import InstrumentDataResponseMessage
 from .file_type_info_request_message import FileTypeInfoRequestMessage
 from .file_type_info_response_message import FileTypeInfoResponseMessage
+from .disconnect_request_message import DisconnectRequestMessage
