@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from midi_tools.util.message import encode
 from midi_tools.util.seven_in_eight import encode as encode_7_8
-from midi_tools.message import Message
+from midi_tools.message import Message, Parser
 
 
 @dataclass(frozen=True)
@@ -22,13 +22,11 @@ class FileTypeInfoResponseMessage(Message):
 
     @classmethod
     def parse(cls, raw: bytes) -> "FileTypeInfoResponseMessage":
-        raise NotImplementedError
-        # # f0 43 50   0 0 2   len data
-        # assert len(raw) >= 7
-        # assert raw[0:7] == bytes([0xF0, 0x43, 0x50,   0x00, 0x00, 0x02,   0x02])
-        # length = raw[7]
-        # assert len(raw) == 7 + length + 1
-        # payload = raw[7:7+length]
-        # assert raw[7+length] == bytes([0xF7])
-        #
-        # return cls(raw, payload)
+        parser = Parser(raw)
+        parser.expect_literal(cls.prefix)
+        length = parser.get_integer(2)
+        payload = parser.get_7_in_8(length)
+        parser.expect_literal(bytes([0xF7]))
+        parser.expect_empty()
+
+        return cls(raw, payload)
