@@ -10,12 +10,7 @@ from midi_tools import midi
 from midi_tools.util import hex
 from midi_tools.message import Message
 from midi_tools.message.factory import create_message
-from midi_tools.message.yamaha import \
-    PingRequestMessage, PingResponseMessage, \
-    ConnectionRequestMessage, ConnectionResponseMessage, \
-    InstrumentDataRequestMessage, InstrumentDataResponseMessage, \
-    FileTypeInfoRequestMessage, FileTypeInfoResponseMessage, \
-    DisconnectRequestMessage
+from midi_tools.message import yamaha
 
 
 class FakePiano:
@@ -43,17 +38,18 @@ class FakePiano:
         else:
             print(f"-> {hex.render(raw_message)}")
 
-        if isinstance(message, PingRequestMessage):
-            self.send_message(PingResponseMessage(None, b"\x01\x01"))
-        elif isinstance(message, InstrumentDataRequestMessage):
-            self.send_message(InstrumentDataResponseMessage(None, hex.parse("00 01 00 00 01 00 01 00 00 39 18 01 14 01 00 00 00 00 00 00 01 7F 00 00 00 32 00 00 00 00 00 00 00 00 00 00 00 00 00 00 27 08 00 00 02 00 03 19 00 00")))
-        elif isinstance(message, FileTypeInfoRequestMessage):
-            self.send_message(FileTypeInfoResponseMessage(None, b".MID;.PLS;.LOG"))
-        elif isinstance(message, ConnectionRequestMessage):
+        if isinstance(message, yamaha.PingRequestMessage):
+            self.send_message(yamaha.PingResponseMessage(None, b"\x01\x01"))
+        elif isinstance(message, yamaha.InstrumentDataRequestMessage):
+            self.send_message(yamaha.InstrumentDataResponseMessage(None, hex.parse("00 01 00 00 01 00 01 00 00 39 18 01 14 01 00 00 00 00 00 00 01 7F 00 00 00 32 00 00 00 00 00 00 00 00 00 00 00 00 00 00 27 08 00 00 02 00 03 19 00 00")))
+        elif isinstance(message, yamaha.FileTypeInfoRequestMessage):
+            self.send_message(yamaha.FileTypeInfoResponseMessage(None, b".MID;.PLS;.LOG"))
+        elif isinstance(message, yamaha.ConnectionRequestMessage):
             print("Connect")
-            self.send_message(ConnectionResponseMessage(None, b"\x00"))
-        elif isinstance(message, DisconnectRequestMessage):
+            self.send_message(yamaha.ConnectionResponseMessage(None, b"\x00"))
+        elif isinstance(message, yamaha.DisconnectRequestMessage):
             print("Disconnect")
+
 
 def main(input_port: str = typer.Option(None, "--in"),
          output_port: str = typer.Option(None, "--out")):
