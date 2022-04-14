@@ -1,4 +1,5 @@
-def encode(value: int, minimum_length: int = None, length: int = None) -> bytes:
+# TODO length should be mandatory; is a version with minimum length required?
+def encode(value: int, *, minimum_length: int = None, length: int = None) -> bytes:
     assert not (minimum_length is not None and length is not None)
 
     result = []
