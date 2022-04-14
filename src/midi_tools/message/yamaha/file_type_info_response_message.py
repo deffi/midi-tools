@@ -7,6 +7,8 @@ from midi_tools.message import Message
 
 @dataclass(frozen=True)
 class FileTypeInfoResponseMessage(Message):
+    prefix = b"\xF0\x43\x50\x00\x00\x06\x02"
+
     string: bytes
 
     def __post_init__(self):

@@ -1,25 +1,24 @@
-from typing import Optional
+from __future__ import annotations
 
-from midi_tools.message import Message
-from midi_tools.message import yamaha
+from typing import Optional, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from midi_tools.message import Message
+
+_map = {}
+
+
+def register_class(cls):
+    print(f"Register {cls} as {cls.prefix}")
+    _map[cls.prefix] = cls
 
 
 def create_message(data: bytes) -> Optional[Message]:
-    if data.startswith(b"\xF0\x43\x50\x00\x00\x00\x01"):
-        return yamaha.PingRequestMessage.parse(data)
-    elif data.startswith(b"\xF0\x43\x50\x00\x00\x00\x02"):
-        return yamaha.PingResponseMessage.parse(data)
-    elif data.startswith(b"\xF0\x43\x50\x00\x00\x01\x01"):
-        return yamaha.ConnectionRequestMessage.parse(data)
-    elif data.startswith(b"\xF0\x43\x50\x00\x00\x01\x02"):
-        return yamaha.ConnectionResponseMessage.parse(data)
-    elif data.startswith(b"\xF0\x43\x50\x00\x00\x02\x01"):
-        return yamaha.InstrumentDataRequestMessage.parse(data)
-    elif data.startswith(b"\xF0\x43\x50\x00\x00\x02\x02"):
-        return yamaha.InstrumentDataResponseMessage.parse(data)
-    elif data.startswith(b"\xF0\x43\x50\x00\x00\x06\x01"):
-        return yamaha.FileTypeInfoRequestMessage.parse(data)
-    elif data.startswith(b"\xF0\x43\x50\x00\x00\x06\x02"):
-        return yamaha.FileTypeInfoResponseMessage.parse(data)
-    else:
+    candidates = [cls for prefix, cls in _map.items() if data.startswith(prefix)]
+
+    if len(candidates) == 0:
         return None
+    elif len(candidates) == 1:
+        return candidates[0].parse(data)
+    else:
+        raise ValueError(f"Ambiguous message; candidates: {candidates}")

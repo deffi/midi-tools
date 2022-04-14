@@ -5,6 +5,8 @@ from midi_tools.message import Message
 
 @dataclass(frozen=True)
 class ControllerChangeMessage(Message):
+    prefix = b"0xB0"  # TODO other channels
+
     channel: int
     controller: int
     value: int
